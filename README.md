@@ -54,7 +54,7 @@ Add these arguments to the `C:\\Program Files (x86)\\Steam\\config\\steamvr.vrse
 "ipdOffset" : -0.001
 ```
 
-when you set `renderCameraMode` to `raw` it disabled parallel projections which causes issues with the StarVR rendering causing the perceived image quality to decrease noticeably. And by adding an slight ipd offset with `ipdOffset` we can avoid potential calibration errors in the eye tracking to ensure the distortion mesh is properly applied.
+when you set `renderCameraMode` to `raw`, it disables parallel projections which causes issues with the StarVR rendering. Causing the perceived image quality to decrease noticeably and by adding an slight ipd offset with `ipdOffset`, we can avoid potential calibration errors in the eye tracking. So we can ensure the distortion mesh is properly applied.
 
 > [!NOTE]
 > This documentation will be obsolete in the near future as the driver will be automatically setting there for the user, during the driver initialization.
