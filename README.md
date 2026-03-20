@@ -45,11 +45,25 @@ Once the update is complete, power cycle the device by unplugging the hub from t
 
 For sake of doing it, create an `StarVR` folder to `%appdata%` because the software attempts to load files from there, and it does not create the folder by default.
 
-### 4. Driver registration
+### 4. SteamVR settings
+
+Add these arguments to the `C:\\Program Files (x86)\\Steam\\config\\steamvr.vrsettings` to the `SteamVR` section when SteamVR is not running.
+
+```
+"renderCameraMode" : "raw",
+"ipdOffset" : -0.001
+```
+
+when you set `renderCameraMode` to `raw` it disabled parallel projections which causes issues with the StarVR rendering causing the perceived image quality to decrease noticeably. And by adding an slight ipd offset with `ipdOffset` we can avoid potential calibration errors in the eye tracking to ensure the distortion mesh is properly applied.
+
+> [!NOTE]
+> This documentation will be obsolete in the near future as the driver will be automatically setting there for the user, during the driver initialization.
+
+### 5. Driver registration
 
 Now you can download the ReStar driver from [here](maybe) and move it to either `C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\drivers\\` or optionally register it using the `vrreg.exe` utility to anywhere you desire.
 
-#### 5. Launch SteamVR
+#### 6. Launch SteamVR
 
 Now you should be able to launch SteamVR and power on any lighthouse based tracker of your preference and the device should work.
 
