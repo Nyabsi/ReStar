@@ -69,9 +69,10 @@ Now you should be able to launch SteamVR and power on any lighthouse based track
 
 ## Known issues
 
-- There is issues with game compatibility, ie. VRChat, Resonite and ChilloutVR are known to either crash, have extreme lag or lack of positional data for HMD.
+- There is issues with game compatibility, ie. VRChat, Resonite and ChilloutVR are known to either crash, have extreme lag or lack of positional data for HMD
 - Currently the driver will constantly complains about chaperone configuration, even if you have valid chaperone configuration
-- The pose submitted for the render layer is incorrect as of right now, so you might see the left eye behave properly but the right eye is incorrectly behaving.
+- The pose submitted for the render layer is incorrect as of right now, so you might see the left eye behave properly but the right eye is incorrectly behaving
+- Due to the nature of the implementation of the head tracking, it introduces jerk in the tracking when shifting up and down
 
 ## Troubleshooting
 
