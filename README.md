@@ -90,31 +90,29 @@ If you skipped the step 2 despite it being instructed, the reason you see black 
 
 ## Hardware compatibility 
 
-Confirmed to work:
-
-- RTX 3080 (Running on Windows 10)
-- RTX 4090 (Running on Windows 11)
+| GPU      | Operating System | Driver Version | State   |
+|----------|------------------|----------------|---------|
+| RTX 3080 | Windows 10       | N/A            | Working |
+| RTX 4090 | Windows 10       | N/A            | Working |
+| RTX 4090 | Windows 11       | N/A            | Working |
 
 ## Game compatibility
 
-What works:
+| Game            | GPU      | OS         | SteamVR | State       | Comments                             |
+| --------------- | -------- | ---------- | ------- | ----------- | ------------------------------------ |
+| BONELAB         | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| BONEWORKS       | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| Beat Saber      | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| Half-Life: Alyx | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| POOLS           | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| Superhot VR     | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| Google Earth VR | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| The Lab         | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| VRChat          | RTX 4090 | Windows 11 | 2.15.6  | Not Working | No head tracking                     |
+| ChilloutVR      | RTX 4090 | Windows 11 | 2.15.6  | Not Working | Extreme stutter and no head tracking |
+| Resonite        | RTX 4090 | Windows 11 | 2.15.6  | Not Working | Crashes on launch                    |
 
-- BONELAB
-- BONEWORKS
-- Beat Saber
-- Half Life Alyx
-- POOLS
-- Superhot
-- Google Earth VR
-- The Lab
-
-What doesn't work:
-
-- VRChat
-- Chillout VR
-- Resonite
-
-Games that have not been listed as "What works" or "What doesn't work" are simply untested, this is non-exhaustive list of very small sample set of games I have tried and I remember trying.
+This is non-exhaustive list of very small sample set of games, you can make an issue to let me know what's working/not working, if you want help with imporving the known compatibility list.
 
 ## License
 
