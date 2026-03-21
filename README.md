@@ -88,6 +88,10 @@ This issues also happened to me on RTX 4090, I am not quite sure of the specific
 
 If you skipped the step 2 despite it being instructed, the reason you see black bars is because the firmware version V06.06 renders the image incorrectly on the firmware level and is incompatible.
 
+### Does your driver already do autoipd though
+
+Yes, launch the Tobii Runtime and ensure the device is detected by it before launching SteamVR, then you should see three lines in the headset which you need to align for it to calibrate the IPD.
+
 ## Hardware compatibility 
 
 | GPU      | Operating System | Driver Version | State   |
