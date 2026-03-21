@@ -94,11 +94,14 @@ Yes, launch the Tobii Runtime and ensure the device is detected by it before lau
 
 ## Hardware compatibility 
 
-| GPU      | Operating System | Driver Version | State   |
-|----------|------------------|----------------|---------|
-| RTX 3080 | Windows 10       | N/A            | Working |
-| RTX 4090 | Windows 10       | N/A            | Working |
-| RTX 4090 | Windows 11       | N/A            | Working |
+| GPU                  | Operating System | Driver Version | Status  |
+|----------------------|------------------|----------------|---------|
+| RTX 3080             | Windows 10       | N/A            | Working |
+| RTX 4090             | Windows 10       | N/A            | Working |
+| RTX 4090             | Windows 11       | N/A            | Working |
+| NVIDIA RTX Pro 6000  | Windows 11       | N/A            | Working ||
+
+Technically, anything >=1080 Ti *should* work with the device.
 
 ## Game compatibility
 
