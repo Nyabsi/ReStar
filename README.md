@@ -61,6 +61,9 @@ when you set `renderCameraMode` to `raw`, it disables parallel projections which
 
 ### 5. Driver registration
 
+> [!IMPORTANT]
+> The driver is not currently available for download, everything will be released shortly.
+
 Now you can download the ReStar driver from [here](maybe) and move it to either `C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\drivers\\` or optionally register it using the `vrreg.exe` utility to anywhere you desire.
 
 #### 6. Launch SteamVR
@@ -95,8 +98,9 @@ Yes, launch the Tobii Runtime and ensure the device is detected by it before lau
 |----------------------|------------------|----------------|---------|
 | RTX 3080             | Windows 10       | N/A            | Working |
 | RTX 4090             | Windows 10       | N/A            | Working |
+| RTX 5090             | Windows 10       | N/A            | Working |
 | RTX 4090             | Windows 11       | N/A            | Working |
-| NVIDIA RTX Pro 6000  | Windows 11       | N/A            | Working ||
+| NVIDIA RTX Pro 6000  | Windows 11       | N/A            | Working |
 
 Technically, anything >=1080 Ti *should* work with the device.
 
