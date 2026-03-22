@@ -94,6 +94,9 @@ Yes, launch the Tobii Runtime and ensure the device is detected by it before lau
 
 ## Hardware compatibility 
 
+> [!NOTE]
+> Technically, anything >=1080 Ti *should* work with the device. This list is not indicative of working devices, but devices which have been tested.
+
 | GPU                  | Operating System | Driver Version | Status  |
 |----------------------|------------------|----------------|---------|
 | RTX 3080             | Windows 10       | N/A            | Working |
@@ -102,25 +105,24 @@ Yes, launch the Tobii Runtime and ensure the device is detected by it before lau
 | RTX 4090             | Windows 11       | N/A            | Working |
 | NVIDIA RTX Pro 6000  | Windows 11       | N/A            | Working |
 
-Technically, anything >=1080 Ti *should* work with the device.
-
 ## Game compatibility
 
-| Game            | GPU      | OS         | SteamVR | State       | Comments                             |
-| --------------- | -------- | ---------- | ------- | ----------- | ------------------------------------ |
-| BONELAB         | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| BONEWORKS       | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| Beat Saber      | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| Half-Life: Alyx | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| POOLS           | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| Superhot VR     | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| Google Earth VR | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| The Lab         | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| VRChat          | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| ChilloutVR      | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| Resonite        | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+> [!NOTE]
+> This is non-exhaustive list of very small sample set of games, you can make an issue to let me know what's working/not working, if you want help with imporving the known compatibility list.
 
-This is non-exhaustive list of very small sample set of games, you can make an issue to let me know what's working/not working, if you want help with imporving the known compatibility list.
+| Game              | GPU      | OS         | SteamVR | State   | Comments |
+|-------------------|----------|------------|---------|---------|----------|
+| BONELAB           | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| BONEWORKS         | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Beat Saber        | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Half-Life: Alyx   | RTX 4090 | Windows 11 | 2.15.6  | Working | Requires launch arguments: `-console -vconsole +sc_no_cull 1 +vr_enable_volume_fog 0 +vr_multiview_instancing 0` |
+| POOLS             | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Superhot VR       | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Google Earth VR   | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| The Lab           | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| VRChat            | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| ChilloutVR        | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Resonite          | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 
 ## License
 
