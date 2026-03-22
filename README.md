@@ -69,10 +69,7 @@ Now you should be able to launch SteamVR and power on any lighthouse based track
 
 ## Known issues
 
-- There is issues with game compatibility, ie. VRChat, Resonite and ChilloutVR are known to either crash, have extreme lag or lack of positional data for HMD
 - Currently the driver will constantly complains about chaperone configuration, even if you have valid chaperone configuration
-- The pose submitted for the render layer is incorrect as of right now, so you might see the left eye behave properly but the right eye is incorrectly behaving
-- Due to the nature of the implementation of the head tracking, it introduces jerk in the tracking when shifting up and down
 
 ## Troubleshooting
 
@@ -115,9 +112,9 @@ Technically, anything >=1080 Ti *should* work with the device.
 | Superhot VR     | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
 | Google Earth VR | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
 | The Lab         | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
-| VRChat          | RTX 4090 | Windows 11 | 2.15.6  | Not Working | No head tracking                     |
-| ChilloutVR      | RTX 4090 | Windows 11 | 2.15.6  | Not Working | Extreme stutter and no head tracking |
-| Resonite        | RTX 4090 | Windows 11 | 2.15.6  | Not Working | Crashes on launch                    |
+| VRChat          | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| ChilloutVR      | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
+| Resonite        | RTX 4090 | Windows 11 | 2.15.6  | Working     | N/A                                  |
 
 This is non-exhaustive list of very small sample set of games, you can make an issue to let me know what's working/not working, if you want help with imporving the known compatibility list.
 
