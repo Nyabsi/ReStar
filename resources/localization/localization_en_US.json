@@ -1,0 +1,11 @@
+{
+  "language_tag": "en_US",
+
+  "Settings_Title": "StarVR One",
+  "Settings_Label_On": "On",
+  "Settings_Label_Off": "Off",
+
+  "Setting_Automatic_Ipd": "Automatic IPD Adjustment",
+  "Setting_Label_Ipd": "Interpupillary Distance",
+  "Setting_Legacy_Mode": "Legacy Mode"
+}

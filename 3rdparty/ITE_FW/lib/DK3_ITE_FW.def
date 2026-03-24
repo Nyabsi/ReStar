@@ -1,0 +1,21 @@
+LIBRARY DK3_ITE_FW.dll
+EXPORTS
+    ITE_BatchNumberRead
+    ITE_BrightnessRead
+    ITE_BrightnessWrite
+    ITE_ConnectToHMD
+    ITE_DisconnectHMD
+    ITE_DisplayAutoOnOffSettingRead
+    ITE_DisplayAutoOnOffSettingWrite
+    ITE_DisplayIDRead
+    ITE_DisplayOnOffStatusRead
+    ITE_DisplayOnTimeRead
+    ITE_EEPROMRead
+    ITE_EEPROMWrite
+    ITE_FPSSettingRead
+    ITE_FPSSettingWrite
+    ITE_FWUpdate
+    ITE_FWVersionRead
+    ITE_HMDPowerCycle
+    ITE_PCBAVersionRead
+    ITE_UniqueIDRead

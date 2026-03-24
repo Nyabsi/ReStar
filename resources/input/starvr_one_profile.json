@@ -1,0 +1,19 @@
+{
+  "jsonid": "input_profile",
+  "controller_type": "starvr_one_hmd",
+  "legacy_binding": "{restar}/input/legacy_binding_starvr_one.json",
+  "input_bindingui_mode": "hmd",
+  "input_bindingui_right": {
+    "image": "{restar}/icons/headset_status_ready.png"
+  },
+  "input_source": {
+    "/proximity": {
+      "type": "button",
+      "binding_image_point": [ 50, 50 ]
+    },
+    "/pose/raw": {
+      "type": "pose",
+      "binding_image_point": [ 50, 50 ]
+    }
+  }
+}

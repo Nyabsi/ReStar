@@ -1,0 +1,20 @@
+{
+  "bindings": {
+    "/actions/legacy": {
+      "sources": [
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/legacy/in/head_proximity"
+            }
+          },
+          "mode": "button",
+          "path": "/user/head/proximity"
+        }
+      ]
+    }
+  },
+  "controller_type": "starvr_one_hmd",
+  "description": "",
+  "name": "Legacy Bindings for StarVR One Headset"
+}
