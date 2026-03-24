@@ -20,4 +20,5 @@ ITE_DLL_EXPORT int ITE_DisconnectHMD(void* handle);
 ITE_DLL_EXPORT int ITE_BrightnessRead(void*, uint8_t* brightnessOut);
 ITE_DLL_EXPORT int ITE_BrightnessWrite(void*, DisplayPanel panel, uint8_t brightness);
 
+ITE_DLL_EXPORT int ITE_FPSSettingRead(void*, DisplayRefreshRate* rate);
 ITE_DLL_EXPORT int ITE_FPSSettingWrite(void*, DisplayRefreshRate rate);

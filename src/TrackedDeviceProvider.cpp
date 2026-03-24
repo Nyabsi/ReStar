@@ -208,6 +208,9 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 	ITE_BrightnessRead(m_headsetHandle, &brightness);
 	m_currentBrightness = static_cast<float>(brightness) / 255.0f;
 
+	DisplayRefreshRate refreshRate;
+	ITE_FPSSettingRead(m_headsetHandle, &refreshRate);
+
 	vr::EVRSettingsError err = {};
 
 	m_refreshRate = vr::VRSettings()->GetInt32(
@@ -217,7 +220,7 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 	);
 
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
-		m_refreshRate = 90; // we're assuming it is 90. This is not the case *always* TODO: read from firmware using ITE_FW
+		m_refreshRate = refreshRate;
 	
 	m_ipd = vr::VRSettings()->GetFloat(
 		vr::k_pch_SteamVR_Section,
@@ -227,6 +230,39 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
 		m_ipd = 64.0f;
+
+	auto temporaryRefreshRate = vr::VRSettings()->GetInt32(
+		"driver_restar",
+		"temporaryRefreshRate",
+		&err
+	);
+
+	if (temporaryRefreshRate != -1 && err == vr::VRSettingsError_None) {
+		switch (temporaryRefreshRate) {
+			case 72:
+				ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_72_HZ);
+				break;
+			case 75:
+				ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_75_HZ);
+				break;
+			case 89:
+				ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_89_HZ);
+				break;
+			case 90:
+				ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_90_HZ);
+				break;
+			default:
+				break;
+		}
+
+		vr::VRSettings()->SetInt32(
+			"driver_restar",
+			"temporaryRefreshRate",
+			-1
+		);
+
+		return vr::VRInitError_Init_Retry; // restart to ensure proper refresh rate is applied
+	}
 
 	vr::VRSettings()->SetFloat(
 		vr::k_pch_SteamVR_Section,
@@ -239,6 +275,9 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 		"ipd",
 		m_ipd
 	);
+
+	// It's set here to avoid shader buffer corruption, fixes the distortion being wonky at the edges.
+	starvr::StarVR_User_SetIPD(m_ipd / 1000.0f);
 
     return result;
 }
@@ -279,7 +318,6 @@ const char* const* TrackedDeviceProvider::GetInterfaceVersions()
 		nullptr
 	};
 
-
 	return versions;
 }
 
@@ -305,10 +343,12 @@ void TrackedDeviceProvider::RunFrame()
 					"preferredRefreshRate"
 				);
 
+				/*
 				float ipd = vr::VRSettings()->GetFloat(
 					vr::k_pch_SteamVR_Section,
 					"ipd"
 				);
+				*/
 
 				if (newBrightness != m_currentBrightness)
 				{
@@ -321,30 +361,22 @@ void TrackedDeviceProvider::RunFrame()
 
 				if (m_refreshRate != refresh)
 				{
-					// TODO: this currently crashes steamvr, it's not intendeed to handle refresh rate changes this way.
 					m_refreshRate = refresh;
-					switch (refresh) {
-						case 72:
-							ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_72_HZ);
-							break;
-						case 75:
-							ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_75_HZ);
-							break;
-						case 89:
-							ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_89_HZ);
-							break;
-						case 90:
-							ITE_FPSSettingWrite(m_headsetHandle, REFRESH_RATE_90_HZ);
-							break;
-						default:
-							break;
-					}
+
+					vr::VRSettings()->SetInt32(
+						"driver_restar",
+						"temporaryRefreshRate",
+						m_refreshRate
+					);
 				}
 
+				// Setting the IPD constantly corrupts the shader buffer, it's now instead written once at Init during startup.
+				/*
 				if (m_ipd != ipd) {
 					m_ipd = ipd;
 					starvr::StarVR_User_SetIPD(ipd / 1000.0f);
 				}
+				*/
 
 				break;
 			}

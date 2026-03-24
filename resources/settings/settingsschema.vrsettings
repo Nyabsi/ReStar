@@ -6,17 +6,17 @@
         "name": "/settings/driver_StarVR/autoIpdEnabled",
         "control": "toggle",
         "label": "#{restar}Setting_Automatic_Ipd",
-
+        "requires_restart": true,
         "on_label": "#{restar}Settings_Label_On",
         "off_label": "#{restar}Settings_Label_Off",
         "off_subsection": {
-            "name": "/settings/steamvr/ipd",
-            "control": "slider",
-            "label": "#{restar}Setting_Label_Ipd",
-            "min": 53,
-            "max": 77,
-            "step": 0.1,
-            "decimals": 1
+          "name": "/settings/steamvr/ipd",
+          "control": "slider",
+          "label": "#{restar}Setting_Label_Ipd",
+          "min": 53,
+          "max": 77,
+          "step": 0.1,
+          "decimals": 1
         }
       },
       {

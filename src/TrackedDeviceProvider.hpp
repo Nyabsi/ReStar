@@ -39,4 +39,5 @@ private:
 	float m_currentBrightness;
 	int32_t m_refreshRate;
 	float m_ipd;
+	std::atomic<bool> m_switchingRefreshRate;
 };
