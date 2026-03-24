@@ -53,7 +53,6 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(void* thisptr, uint32_t u
 	vr::EVRInitError result = OpenVR_Activate(thisptr, unObjectId);
 	vr::PropertyContainerHandle_t container = vr::VRProperties()->TrackedDeviceToPropertyContainer(unObjectId);
 
-
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_TrackingSystemName_String, "starvr_one");
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_ModelNumber_String, "StarVR One");
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_SerialNumber_String, "starvr_one_headset");
@@ -72,13 +71,12 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(void* thisptr, uint32_t u
 
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_NeverTracked_Bool, false);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_Identifiable_Bool, false);
-	vr::VRProperties()->SetBoolProperty(container, vr::Prop_ContainsProximitySensor_Bool, true);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_IsOnDesktop_Bool, false);
 
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DashboardScale_Float, 0.9f);
 
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_CanUnifyCoordinateSystemWithHmd_Bool, true);
-	vr::VRProperties()->SetBoolProperty(container, vr::Prop_ContainsProximitySensor_Bool, true);
+	vr::VRProperties()->SetBoolProperty(container, vr::Prop_ContainsProximitySensor_Bool, false);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_UseAdvancedPrediction_Bool, true);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_ForceSystemLayerUseAppPoses_Bool, true);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_Hmd_AllowsClientToControlTextureIndex, true);
@@ -88,7 +86,7 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(void* thisptr, uint32_t u
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasDisplayComponent_Bool, true);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasCameraComponent_Bool, false);
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasDriverDirectModeComponent_Bool, true);
-	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasVirtualDisplayComponent_Bool, true);
+	vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasVirtualDisplayComponent_Bool, false);
 
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceOff_String, "{restar}/icons/headset_status_off.png");
 	vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceSearching_String, "{restar}/icons/headset_status_searching.gif");
