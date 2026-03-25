@@ -24,10 +24,9 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 HMODULE lib = nullptr;
 HmdDriverFactoryFn factory = nullptr;
 
-vr::DriverPose_t GetPose()
+static vr::DriverPose_t GetPose(uint32_t variant)
 {
-	static vr::TrackedDeviceIndex_t trackerIndex =
-		vr::k_unTrackedDeviceIndexInvalid;
+	static vr::TrackedDeviceIndex_t trackerIndex = vr::k_unTrackedDeviceIndexInvalid;
 	static bool trackerResolved = false;
 
 	if (!trackerResolved)
@@ -45,20 +44,13 @@ vr::DriverPose_t GetPose()
 			vr::ETrackedPropertyError err;
 
 			int32_t deviceClass =
-				props->GetInt32Property(
-					h,
-					vr::Prop_DeviceClass_Int32,
-					&err
-				);
+			props->GetInt32Property(
+				h,
+				vr::Prop_DeviceClass_Int32,
+				&err
+			);
 
-			bool hasBattery =
-				props->GetBoolProperty(
-					h,
-					vr::Prop_DeviceProvidesBatteryStatus_Bool,
-					&err
-				);
-
-			if (deviceClass == vr::TrackedDeviceClass_GenericTracker && hasBattery)
+			if (deviceClass == vr::TrackedDeviceClass_GenericTracker && err == vr::TrackedProp_Success)
 			{
 				trackerIndex = i;
 				trackerResolved = true;
@@ -90,11 +82,17 @@ vr::DriverPose_t GetPose()
 		{
 			vr::HmdQuaternion_t trackerQuat = HmdQuaternion_FromMatrix(tp.mDeviceToAbsoluteTracking);
 
-			constexpr float deg = 90.0f * (float)M_PI / 180.0f;
-			constexpr float half = deg * 0.5f;
-			vr::HmdQuaternion_t qMountInv{ cosf(half), -sinf(half), 0.0f, 0.0f };
+			// XT variant assumes 90-degree rotation for the Vive Tracker, due to firmware rotation.
+			if (variant == 1) {
+				constexpr float deg = 90.0f * (float)M_PI / 180.0f;
+				constexpr float half = deg * 0.5f;
+				vr::HmdQuaternion_t qMountInv{ cosf(half), -sinf(half), 0.0f, 0.0f };
 
-			pose.qRotation = Normalize(Multiply(trackerQuat, qMountInv));
+				pose.qRotation = Normalize(Multiply(trackerQuat, qMountInv));
+			}
+			else {
+				pose.qRotation = trackerQuat;
+			}
 
 			double trackerPos[3] = {
 				tp.mDeviceToAbsoluteTracking.m[0][3],
@@ -102,8 +100,14 @@ vr::DriverPose_t GetPose()
 				tp.mDeviceToAbsoluteTracking.m[2][3]
 			};
 
-			//vr::HmdVector3_t localEyeOffset{ 0.0f, 0.0f, 0.0f };
-			vr::HmdVector3_t localEyeOffset{ 0.0f, -(78.999499999999998f * 0.001f), (52.927599999999998f * 0.001f) };
+			vr::HmdVector3_t localEyeOffset = {};
+			if (variant == 1) {
+				// TODO: this is extracted from EEPROM, make sure it doesn't change per-device.
+				localEyeOffset = { 0.0f, -(78.999499999999998f * 0.001f), (52.927599999999998f * 0.001f) };
+			}
+			else {
+				localEyeOffset = { 0.0f, 0.0f, 0.0f };
+			}
 			vr::HmdVector3_t worldOffset = RotateVector(pose.qRotation, localEyeOffset);
 
 			pose.vecPosition[0] = trackerPos[0] + worldOffset.v[0];
@@ -142,9 +146,10 @@ TrackedDeviceProvider::TrackedDeviceProvider()
 	m_provider = nullptr;
 	m_starPatcher = std::make_unique<StarPatcher>();
 	m_headsetHandle = nullptr;
-	m_currentBrightness = 1.0f;
-	m_refreshRate = 90;
-	m_ipd = 56.0;
+	m_currentBrightness = {};
+	m_refreshRate = {};
+	m_ipd = {};
+	m_trackingVariant = {};
 }
 
 vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContext)
@@ -230,6 +235,15 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
 		m_ipd = 64.0f;
+
+	m_trackingVariant = vr::VRSettings()->GetInt32(
+		"driver_restar",
+		"hmdTrackerVariant",
+		&err
+	);
+
+	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
+		m_trackingVariant = 1;
 
 	auto temporaryRefreshRate = vr::VRSettings()->GetInt32(
 		"driver_restar",
@@ -404,7 +418,7 @@ void TrackedDeviceProvider::LeaveStandby()
 void TrackedDeviceProvider::Update()
 {
 	while (m_is_active_) {
-		vr::VRServerDriverHost()->TrackedDevicePoseUpdated(0, GetPose(), sizeof(vr::DriverPose_t));
+		vr::VRServerDriverHost()->TrackedDevicePoseUpdated(0, GetPose(m_trackingVariant), sizeof(vr::DriverPose_t));
 		std::this_thread::sleep_for(4ms);
 	}
 }

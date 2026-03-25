@@ -1,8 +1,6 @@
 {
-   "driver_restar" : {
-      "enable" : true
-   },
-   "steamvr": {
-      "ipd": 58.0
-   }
+  "driver_restar": {
+    "enable": true,
+    "hmdTrackerVariant":  1
+  }
 }
