@@ -38,6 +38,5 @@ private:
 
 	float m_currentBrightness;
 	int32_t m_refreshRate;
-	float m_ipd;
 	int32_t m_trackingVariant;
 };

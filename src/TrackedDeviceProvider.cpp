@@ -148,7 +148,6 @@ TrackedDeviceProvider::TrackedDeviceProvider()
 	m_headsetHandle = nullptr;
 	m_currentBrightness = {};
 	m_refreshRate = {};
-	m_ipd = {};
 	m_trackingVariant = {};
 }
 
@@ -227,14 +226,19 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
 		m_refreshRate = refreshRate;
 	
-	m_ipd = vr::VRSettings()->GetFloat(
+	vr::VRSettings()->GetFloat(
 		vr::k_pch_SteamVR_Section,
 		"ipd",
 		&err
 	);
 
-	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
-		m_ipd = 64.0f;
+	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault) {
+		vr::VRSettings()->SetFloat(
+			vr::k_pch_SteamVR_Section,
+			"ipd",
+			64.0f
+		);
+	}
 
 	m_trackingVariant = vr::VRSettings()->GetInt32(
 		"driver_restar",
@@ -283,15 +287,6 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 		"analogGain",
 		powf(m_currentBrightness, 2.2f)
 	);
-
-	vr::VRSettings()->SetFloat(
-		vr::k_pch_SteamVR_Section,
-		"ipd",
-		m_ipd
-	);
-
-	// It's set here to avoid shader buffer corruption, fixes the distortion being wonky at the edges.
-	starvr::StarVR_User_SetIPD(m_ipd / 1000.0f);
 
     return result;
 }
@@ -357,13 +352,6 @@ void TrackedDeviceProvider::RunFrame()
 					"preferredRefreshRate"
 				);
 
-				/*
-				float ipd = vr::VRSettings()->GetFloat(
-					vr::k_pch_SteamVR_Section,
-					"ipd"
-				);
-				*/
-
 				if (newBrightness != m_currentBrightness)
 				{
 					m_currentBrightness = newBrightness;
@@ -383,14 +371,6 @@ void TrackedDeviceProvider::RunFrame()
 						m_refreshRate
 					);
 				}
-
-				// Setting the IPD constantly corrupts the shader buffer, it's now instead written once at Init during startup.
-				/*
-				if (m_ipd != ipd) {
-					m_ipd = ipd;
-					starvr::StarVR_User_SetIPD(ipd / 1000.0f);
-				}
-				*/
 
 				break;
 			}

@@ -79,10 +79,17 @@ namespace vrstub
 class IVRDriverDirectModeComponentWrapper : public vrstub::IVRDriverDirectModeComponent_009
 {
 	vrstub::IVRDriverDirectModeComponent_005* m_original;
+	float m_ipd;
+	bool m_autoIpdEnabled;
 
 public:
 	IVRDriverDirectModeComponentWrapper(vrstub::IVRDriverDirectModeComponent_005* original)
-		: m_original(original) {
+		: m_original(original)
+	{
+		m_autoIpdEnabled = vr::VRSettings()->GetBool(
+			"driver_StarVR",
+			"autoIpdEnabled"
+		);
 	}
 
 	void CreateSwapTextureSet(uint32_t unPid, const vrstub::SwapTextureSetDesc_t* pDesc,
@@ -120,8 +127,17 @@ public:
 			v5[i].mProjection = perEye[i].mProjection;
 		}
 
-		v5[0].bounds.uMin = perEye[0].bounds.uMin - 0.005f;
-		v5[1].bounds.uMax = perEye[1].bounds.uMax + 0.005f;
+		if (!m_autoIpdEnabled) {
+			// TODO: figure out if calling VRSettings here constantly could cause issues.
+			m_ipd = vr::VRSettings()->GetFloat(
+				vr::k_pch_SteamVR_Section,
+				"ipd"
+			);
+
+			float ipdOffset = ((m_ipd - 64.0f) / 1000.0f);
+			v5[0].bounds.uMin = perEye[0].bounds.uMin - ipdOffset;
+			v5[1].bounds.uMax = perEye[1].bounds.uMax + ipdOffset;
+		}
 
 		const vr::HmdMatrix34_t& left = perEye[0].mHmdPose;
 		const vr::HmdMatrix34_t& right = perEye[1].mHmdPose;
