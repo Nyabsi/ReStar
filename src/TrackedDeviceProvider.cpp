@@ -419,6 +419,6 @@ void TrackedDeviceProvider::Update()
 {
 	while (m_is_active_) {
 		vr::VRServerDriverHost()->TrackedDevicePoseUpdated(0, GetPose(m_trackingVariant), sizeof(vr::DriverPose_t));
-		std::this_thread::sleep_for(4ms);
+		std::this_thread::sleep_for(1ms);
 	}
 }
