@@ -120,8 +120,8 @@ public:
 			v5[i].mProjection = perEye[i].mProjection;
 		}
 
-		v5[0].bounds.uMin = perEye[0].bounds.uMin - 0.025f;
-		v5[1].bounds.uMax = perEye[1].bounds.uMax + 0.025f;
+		v5[0].bounds.uMin = perEye[0].bounds.uMin - 0.005f;
+		v5[1].bounds.uMax = perEye[1].bounds.uMax + 0.005f;
 
 		const vr::HmdMatrix34_t& left = perEye[0].mHmdPose;
 		const vr::HmdMatrix34_t& right = perEye[1].mHmdPose;
