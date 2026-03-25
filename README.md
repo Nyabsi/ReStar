@@ -7,11 +7,11 @@ ReStar is a SteamVR driver patch for the StarVR One that aims to reimplement nat
 
 ## Patches
 
-- Some of the driver interfaces have been version upgraded through shim interfaces
-- Device controls are now native—no third-party software required (like the Valve Index)
-- StarVR One XT now uses mounted Vive, Tundra or other lighthouse tracker for HMD tracking
-- Driver properties have been spoofed to reflect modern driver behaviours
-- The StarVR tracking override behaviour has been removed
+- Settings are now integrated to SteamVR, third-party software is no longer required.
+- Device icon has been upgraded to use the modern SteamVR gradient variant
+- An proper input profile is now provided, which is required for modern game engines to function
+- The tracking override has been replaced with robust tracking code
+- Manual IPD adjustment that modifies UV bounds instead of distortion mesh to improve visual clarity
 
 ## Installation
 
@@ -50,11 +50,8 @@ For sake of doing it, create an `StarVR` folder to `%appdata%` because the softw
 Add these arguments to the `C:\\Program Files (x86)\\Steam\\config\\steamvr.vrsettings` to the `SteamVR` section when SteamVR is not running.
 
 ```
-"renderCameraMode" : "raw",
-"ipdOffset" : -0.001
+"renderCameraMode" : "raw"
 ```
-
-when you set `renderCameraMode` to `raw`, it disables parallel projections which causes issues with the StarVR rendering. Causing the perceived image quality to decrease noticeably and by adding an slight ipd offset with `ipdOffset`, we can avoid potential calibration errors in the eye tracking. So we can ensure the distortion mesh is properly applied.
 
 > [!NOTE]
 > This documentation will be obsolete in the near future as the driver will be automatically setting there for the user, during the driver initialization.
@@ -72,7 +69,7 @@ Now you should be able to launch SteamVR and power on any lighthouse based track
 
 ## Known issues
 
-- Currently the driver will constantly complains about chaperone configuration, even if you have valid chaperone configuration
+- None I am aware of, if you encounter something. Let me know.
 
 ## Troubleshooting
 
@@ -91,6 +88,10 @@ If you skipped the step 2 despite it being instructed, the reason you see black 
 ### Does your driver already do autoipd though
 
 Yes, launch the Tobii Runtime and ensure the device is detected by it before launching SteamVR, then you should see three lines in the headset which you need to align for it to calibrate the IPD.
+
+### Tobii eye tracking doesn't detect the HMD / the IR leds don't turn on
+
+Just plug out both USB cables from your computer and re-plug them one by one, and then the device should be detected by the software.
 
 ## Hardware compatibility 
 
@@ -114,14 +115,14 @@ Yes, launch the Tobii Runtime and ensure the device is detected by it before lau
 |-------------------|----------|------------|---------|---------|----------|
 | BONELAB           | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | BONEWORKS         | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
-| Beat Saber        | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| Beat Saber        | RTX 3080 | Windows 10 | 2.15.6  | Working | The game will start misbehaving when the per-eye rendering resolution is too high, if the game has abnormal behaviour i.e., non-stopping lagging or notes rendering incorrectly, decrease the rendering resolution. All effects are only rendered on the right eye. |
 | Half-Life: Alyx   | RTX 4090 | Windows 11 | 2.15.6  | Working | Requires launch arguments: `-console -vconsole +sc_no_cull 1 +vr_enable_volume_fog 0 +vr_multiview_instancing 0` |
 | POOLS             | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | Superhot VR       | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | Google Earth VR   | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | The Lab           | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | VRChat            | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
-| ChilloutVR        | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
+| ChilloutVR        | RTX 3080 | Windows 10 | 2.15.6  | Working | The game will start misbehaving when the per-eye rendering resolution is too high, if the game has abnormal behaviour i.e., non-stopping lagging or notes rendering incorrectly, decrease the rendering resolution. |
 | Resonite          | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 
 ## License
