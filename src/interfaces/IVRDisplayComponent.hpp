@@ -47,10 +47,7 @@ public:
 	}
 
 	void GetWindowBounds(int32_t* pnX, int32_t* pnY, uint32_t* pnWidth, uint32_t* pnHeight) override {
-		*pnX = 0;
-		*pnY = 0;
-		*pnWidth = 1792;
-		*pnHeight = 2240;
+		m_pOriginal->GetWindowBounds(pnX, pnY, pnWidth, pnHeight);
 	}
 	bool IsDisplayOnDesktop() override {
 		return false;
@@ -59,8 +56,7 @@ public:
 		return true;
 	}
 	void GetRecommendedRenderTargetSize(uint32_t* pnWidth, uint32_t* pnHeight) override {
-		*pnWidth = 1792;
-		*pnHeight = 2240 * 2;
+		m_pOriginal->GetRecommendedRenderTargetSize(pnWidth, pnHeight);
 	}
 	void GetEyeOutputViewport(vr::EVREye eEye, uint32_t* pnX, uint32_t* pnY, uint32_t* pnWidth, uint32_t* pnHeight) override {
 		m_pOriginal->GetEyeOutputViewport(eEye, pnX, pnY, pnWidth, pnHeight);
