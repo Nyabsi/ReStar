@@ -7,7 +7,7 @@ ReStar is a SteamVR driver patch for the StarVR One that aims to reimplement nat
 
 ## Patches
 
-- Settings are now integrated to SteamVR, third-party software is no longer required.
+- Settings are now integrated to SteamVR, third-party software is no longer required
 - Device icon has been upgraded to use the modern SteamVR gradient variant
 - An proper input profile is now provided, which is required for modern game engines to function
 - The tracking override has been replaced with robust tracking code
@@ -122,7 +122,7 @@ Just plug out both USB cables from your computer and re-plug them one by one, an
 | Google Earth VR   | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | The Lab           | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 | VRChat            | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
-| ChilloutVR        | RTX 3080 | Windows 10 | 2.15.6  | Working | The game will start misbehaving when the per-eye rendering resolution is too high, if the game has abnormal behaviour i.e., non-stopping lagging or notes rendering incorrectly, decrease the rendering resolution. |
+| ChilloutVR        | RTX 3080 | Windows 10 | 2.15.6  | Working | The game will start misbehaving when the per-eye rendering resolution is too high, if the game has abnormal lag, decrease the rendering resolution. |
 | Resonite          | RTX 4090 | Windows 11 | 2.15.6  | Working |          |
 
 ## License
