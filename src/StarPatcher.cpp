@@ -100,6 +100,9 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(void* thisptr, uint32_t u
 	std::vector<float> available_frametimes = { 72.0f, 75.0f, 89.0f, 90.0f };
 	vr::VRProperties()->SetPropertyVector(container, vr::Prop_DisplayAvailableFrameRates_Float_Array, vr::k_unFloatPropertyTag, &available_frametimes);
 
+	//vr::VRProperties()->SetInt32Property(container, vr::Prop_EdidVendorID_Int32, 0x7204);
+	//vr::VRProperties()->SetInt32Property(container, vr::Prop_EdidProductID_Int32, 0x7530);
+
 	vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplaySupportsAnalogGain_Bool, true);
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMinAnalogGain_Float, 0.0f);
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMaxAnalogGain_Float, 1.0f);
@@ -116,6 +119,7 @@ void* __fastcall StarPatcher::GetComponentPatch(void* thisptr, const char* name)
 			);
 		return m_displayComponentWrapper.get();
 	}
+
 	if (strcmp(name, "IVRDriverDirectModeComponent_009") == 0) {
 		if (m_directModeComponentWrapper == nullptr)
 			m_directModeComponentWrapper = std::make_unique<IVRDriverDirectModeComponentWrapper>(

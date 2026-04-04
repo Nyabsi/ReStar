@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.20)
 
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 project(openvr_restar)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -35,7 +35,7 @@ add_library(driver_restar SHARED
 
 target_include_directories(driver_restar PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-target_compile_features(driver_restar PUBLIC cxx_std_23)
+target_compile_features(driver_restar PUBLIC cxx_std_20)
 
 target_link_libraries(driver_restar
     PRIVATE
@@ -44,11 +44,6 @@ target_link_libraries(driver_restar
         ITE_FW
         StarVR_API
         minhook
-)
-
-target_compile_options(driver_restar PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall -Wextra -Wpedantic -Werror>
 )
 
 set(CUSTOM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin")

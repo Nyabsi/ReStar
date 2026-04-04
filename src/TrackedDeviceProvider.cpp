@@ -23,6 +23,7 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 
 HMODULE lib = nullptr;
 HmdDriverFactoryFn factory = nullptr;
+static vr::HmdVector3_t omegaPrev = { 0.0f, 0.0f, 0.0f };
 
 static vr::DriverPose_t GetPose(uint32_t variant)
 {
@@ -44,11 +45,11 @@ static vr::DriverPose_t GetPose(uint32_t variant)
 			vr::ETrackedPropertyError err;
 
 			int32_t deviceClass =
-			props->GetInt32Property(
-				h,
-				vr::Prop_DeviceClass_Int32,
-				&err
-			);
+				props->GetInt32Property(
+					h,
+					vr::Prop_DeviceClass_Int32,
+					&err
+				);
 
 			if (deviceClass == vr::TrackedDeviceClass_GenericTracker && err == vr::TrackedProp_Success)
 			{
@@ -131,6 +132,19 @@ static vr::DriverPose_t GetPose(uint32_t variant)
 			pose.vecVelocity[1] = tp.vVelocity.v[1] + alpha * tanVelWorld.v[1];
 			pose.vecVelocity[2] = tp.vVelocity.v[2] + alpha * tanVelWorld.v[2];
 
+			float deltaTime = 0.011f;
+
+			vr::HmdVector3_t angularAcceleration;
+			angularAcceleration.v[0] = (omega.v[0] - omegaPrev.v[0]) / deltaTime;
+			angularAcceleration.v[1] = (omega.v[1] - omegaPrev.v[1]) / deltaTime;
+			angularAcceleration.v[2] = (omega.v[2] - omegaPrev.v[2]) / deltaTime;
+
+			omegaPrev = omega;
+
+			pose.vecAngularAcceleration[0] = angularAcceleration.v[0];
+			pose.vecAngularAcceleration[1] = angularAcceleration.v[1];
+			pose.vecAngularAcceleration[2] = angularAcceleration.v[2];
+
 			pose.poseIsValid = true;
 			pose.deviceIsConnected = true;
 			pose.result = vr::TrackingResult_Running_OK;
@@ -140,13 +154,13 @@ static vr::DriverPose_t GetPose(uint32_t variant)
 	return pose;
 }
 
-
 TrackedDeviceProvider::TrackedDeviceProvider()
 {
 	m_provider = nullptr;
 	m_starPatcher = std::make_unique<StarPatcher>();
 	m_headsetHandle = nullptr;
 	m_currentBrightness = {};
+	m_ipd = {};
 	m_refreshRate = {};
 	m_trackingVariant = {};
 }
@@ -203,16 +217,13 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 
     auto result = m_provider->Init(pDriverContext);
 
-	m_is_active_.exchange(true);
-	m_update_thread_ = std::thread(&TrackedDeviceProvider::Update, this);
+	ITE_ConnectToHMD(&m_headsetHandle, 0, 0);
 
-	ITE_ConnectToHMD(&m_headsetHandle);
-
-	uint8_t brightness;
+	uint16_t brightness = {};
 	ITE_BrightnessRead(m_headsetHandle, &brightness);
 	m_currentBrightness = static_cast<float>(brightness) / 255.0f;
 
-	DisplayRefreshRate refreshRate;
+	DisplayRefreshRate refreshRate = {};
 	ITE_FPSSettingRead(m_headsetHandle, &refreshRate);
 
 	vr::EVRSettingsError err = {};
@@ -226,18 +237,16 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault)
 		m_refreshRate = refreshRate;
 	
-	vr::VRSettings()->GetFloat(
+	m_ipd = vr::VRSettings()->GetFloat(
 		vr::k_pch_SteamVR_Section,
 		"ipd",
 		&err
 	);
 
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault) {
-		vr::VRSettings()->SetFloat(
-			vr::k_pch_SteamVR_Section,
-			"ipd",
-			64.0f
-		);
+		float ipd;
+		starvr::StarVR_User_GetIPD(&ipd);
+		m_ipd = ipd / 1000.0f;
 	}
 
 	m_trackingVariant = vr::VRSettings()->GetInt32(
@@ -288,6 +297,12 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 		powf(m_currentBrightness, 2.2f)
 	);
 
+	vr::VRSettings()->SetFloat(
+		vr::k_pch_SteamVR_Section,
+		"ipd",
+		m_ipd
+	);
+	 
     return result;
 }
 
@@ -352,6 +367,11 @@ void TrackedDeviceProvider::RunFrame()
 					"preferredRefreshRate"
 				);
 
+				float ipd = vr::VRSettings()->GetFloat(
+					vr::k_pch_SteamVR_Section,
+					"ipd"
+				);
+
 				if (newBrightness != m_currentBrightness)
 				{
 					m_currentBrightness = newBrightness;
@@ -372,6 +392,20 @@ void TrackedDeviceProvider::RunFrame()
 					);
 				}
 
+				if (m_ipd != ipd) {
+					m_ipd = ipd;
+					starvr::StarVR_User_SetIPD(ipd / 1000.0f);
+				}
+
+				break;
+			}
+			case vr::VREvent_TrackedDeviceActivated:
+			{
+				if (event.trackedDeviceIndex == vr::k_unTrackedDeviceIndex_Hmd) {
+					m_is_active_.exchange(true);
+					m_update_thread_ = std::thread(&TrackedDeviceProvider::Update, this);
+					starvr::StarVR_User_SetIPD(m_ipd);
+				}
 				break;
 			}
 		}
@@ -399,6 +433,6 @@ void TrackedDeviceProvider::Update()
 {
 	while (m_is_active_) {
 		vr::VRServerDriverHost()->TrackedDevicePoseUpdated(0, GetPose(m_trackingVariant), sizeof(vr::DriverPose_t));
-		std::this_thread::sleep_for(1ms);
+		std::this_thread::sleep_for(11ms);
 	}
 }

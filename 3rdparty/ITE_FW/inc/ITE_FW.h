@@ -4,6 +4,11 @@
 
 #include <stdint.h>
 
+#ifndef _ITE_HANDLE
+#define _ITE_HANDLE
+typedef void* ITE_HANDLE;
+#endif // _ITE_HANDLE
+
 #if defined(_WIN32)
 #define ITE_DLL_EXPORT extern "C" __declspec( dllexport )
 #define ITE_DLL_EXPORT extern "C" __declspec( dllimport )
@@ -14,11 +19,11 @@
 #error "Unsupported Platform."
 #endif
 
-ITE_DLL_EXPORT int ITE_ConnectToHMD(void* handle);
-ITE_DLL_EXPORT int ITE_DisconnectHMD(void* handle);
+ITE_DLL_EXPORT int ITE_ConnectToHMD(ITE_HANDLE* handle, int64_t __reserved1, int64_t __reserved2); // IDA shows rsp = 0x20, reserve two more variables to pad stack.
+ITE_DLL_EXPORT int ITE_DisconnectHMD(ITE_HANDLE handle);
 
-ITE_DLL_EXPORT int ITE_BrightnessRead(void*, uint8_t* brightnessOut);
-ITE_DLL_EXPORT int ITE_BrightnessWrite(void*, DisplayPanel panel, uint8_t brightness);
+ITE_DLL_EXPORT int ITE_BrightnessRead(ITE_HANDLE handle, uint16_t* brightnessOut); // brightnessOut is an value between 0-255 but firmware tool reports it as short.
+ITE_DLL_EXPORT int ITE_BrightnessWrite(ITE_HANDLE handle, DisplayPanel panel, uint8_t brightness);
 
-ITE_DLL_EXPORT int ITE_FPSSettingRead(void*, DisplayRefreshRate* rate);
-ITE_DLL_EXPORT int ITE_FPSSettingWrite(void*, DisplayRefreshRate rate);
+ITE_DLL_EXPORT int ITE_FPSSettingRead(ITE_HANDLE handle, DisplayRefreshRate* rate);
+ITE_DLL_EXPORT int ITE_FPSSettingWrite(ITE_HANDLE handle, DisplayRefreshRate rate);

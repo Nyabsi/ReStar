@@ -17,7 +17,7 @@ namespace vrstub
 
 	struct SwapTextureSet_t
 	{
-		vr::SharedTextureHandle_t rSharedTextureHandles[3];
+		vr::SharedTextureHandle_t rSharedTextureHandles[2];
 		uint32_t unTextureFlags;
 	};
 
@@ -97,10 +97,10 @@ public:
 	{
 		vr::SharedTextureHandle_t handles[3] = {};
 		m_original->CreateSwapTextureSet(unPid, pDesc, &handles);
+
 		pOutSwapTextureSet->rSharedTextureHandles[0] = handles[0];
 		pOutSwapTextureSet->rSharedTextureHandles[1] = handles[1];
 		pOutSwapTextureSet->rSharedTextureHandles[2] = handles[2];
-		pOutSwapTextureSet->unTextureFlags = 0;
 	}
 
 	void DestroySwapTextureSet(vr::SharedTextureHandle_t h) override {
@@ -127,38 +127,7 @@ public:
 			v5[i].mProjection = perEye[i].mProjection;
 		}
 
-		if (!m_autoIpdEnabled) {
-			// TODO: figure out if calling VRSettings here constantly could cause issues.
-			m_ipd = vr::VRSettings()->GetFloat(
-				vr::k_pch_SteamVR_Section,
-				"ipd"
-			);
-
-			float ipdOffset = ((m_ipd - 64.0f) / 1000.0f);
-			v5[0].bounds.uMin = perEye[0].bounds.uMin - ipdOffset;
-			v5[1].bounds.uMax = perEye[1].bounds.uMax + ipdOffset;
-		}
-
-		const vr::HmdMatrix34_t& left = perEye[0].mHmdPose;
-		const vr::HmdMatrix34_t& right = perEye[1].mHmdPose;
-
-		float position_left[3] = { left.m[0][3], left.m[1][3], left.m[2][3] };
-		float position_right[3] = { right.m[0][3], right.m[1][3], right.m[2][3] };
-
-		float hmd_position[3] =
-		{
-			0.5f * (position_left[0] + position_right[0]),
-			0.5f * (position_left[1] + position_right[1]),
-			0.5f * (position_left[2] + position_right[2])
-		};
-
-		vr::HmdMatrix34_t hmd_pose = left;
-
-		hmd_pose.m[0][3] = hmd_position[0];
-		hmd_pose.m[1][3] = hmd_position[1];
-		hmd_pose.m[2][3] = hmd_position[2];
-
-		m_original->SubmitLayer(v5, &hmd_pose);
+		m_original->SubmitLayer(v5, &perEye[1].mHmdPose);
 	}
 
 	void Present(vr::SharedTextureHandle_t syncTexture) override {

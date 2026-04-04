@@ -6,6 +6,7 @@
 #include <openvr_driver.h>
 
 #include <StarPatcher.hpp>
+#include <ITE_FW.h>
 
 using HmdDriverFactoryFn = void* (*)(const char*, int*);
 
@@ -30,13 +31,14 @@ public:
 private:
 	IServerTrackedDeviceProvider* m_provider;
 	std::unique_ptr<StarPatcher> m_starPatcher;
-	void* m_headsetHandle;
+	ITE_HANDLE m_headsetHandle;
 
 	void Update();
 	std::atomic<bool> m_is_active_;
 	std::thread m_update_thread_;
 
 	float m_currentBrightness;
+	float m_ipd;
 	int32_t m_refreshRate;
 	int32_t m_trackingVariant;
 };
