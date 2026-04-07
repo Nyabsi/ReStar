@@ -19,10 +19,10 @@ typedef void* ITE_HANDLE;
 #error "Unsupported Platform."
 #endif
 
-ITE_DLL_EXPORT int ITE_ConnectToHMD(ITE_HANDLE* handle, int64_t __reserved1, int64_t __reserved2); // IDA shows rsp = 0x20, reserve two more variables to pad stack.
+ITE_DLL_EXPORT int ITE_ConnectToHMD(ITE_HANDLE* handle, int64_t __reserved1, int64_t __reserved2);
 ITE_DLL_EXPORT int ITE_DisconnectHMD(ITE_HANDLE handle);
 
-ITE_DLL_EXPORT int ITE_BrightnessRead(ITE_HANDLE handle, uint16_t* brightnessOut); // brightnessOut is an value between 0-255 but firmware tool reports it as short.
+ITE_DLL_EXPORT int ITE_BrightnessRead(ITE_HANDLE handle, uint16_t* brightness);
 ITE_DLL_EXPORT int ITE_BrightnessWrite(ITE_HANDLE handle, DisplayPanel panel, uint8_t brightness);
 
 ITE_DLL_EXPORT int ITE_FPSSettingRead(ITE_HANDLE handle, DisplayRefreshRate* rate);

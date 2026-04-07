@@ -1,9 +1,7 @@
 #pragma once
 
 #include <memory>
-
-#include <interfaces/IVRDisplayComponent.hpp>
-#include <interfaces/IVRDriverDirectModeComponent.hpp>
+#include <openvr_driver.h>
 
 class StarPatcher {
 public:
@@ -12,9 +10,6 @@ public:
 	void Destroy();
 private:
 	static vr::EVRInitError ActivatePatch(void* thisptr, uint32_t unObjectId);
-	static void* GetComponentPatch(void* thisptr, const char* name);
 
 	uintptr_t m_moduleBase;
-	static std::unique_ptr<IVRDisplayComponentWrapper> m_displayComponentWrapper;
-	static std::unique_ptr<IVRDriverDirectModeComponentWrapper> m_directModeComponentWrapper;
 };

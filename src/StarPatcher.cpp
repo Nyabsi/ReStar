@@ -11,13 +11,13 @@ OpenVR_Activate_tmpl OpenVR_Activate = nullptr;
 using OpenVR_GetComponent_tmpl = void* (__fastcall*)(void*, const char*);
 OpenVR_GetComponent_tmpl OpenVR_GetComponent = nullptr;
 
-std::unique_ptr<IVRDisplayComponentWrapper> StarPatcher::m_displayComponentWrapper = nullptr;
-std::unique_ptr<IVRDriverDirectModeComponentWrapper> StarPatcher::m_directModeComponentWrapper = nullptr;
-
 StarPatcher::StarPatcher()
 {
 	m_moduleBase = {};
 }
+
+#define SVR_ACTIVATE_1_00_2001 0x16E60
+#define SVR_ACTIVATE_2_99_9999 0x183C0
 
 void StarPatcher::Initialize(uintptr_t mod)
 {
@@ -28,15 +28,9 @@ void StarPatcher::Initialize(uintptr_t mod)
 	status = MH_Initialize();
 
 	status = MH_CreateHook(
-		reinterpret_cast<void*>(m_moduleBase + 0x16E60),
+		reinterpret_cast<void*>(m_moduleBase + SVR_ACTIVATE_2_99_9999),
 		reinterpret_cast<void*>(StarPatcher::ActivatePatch),
 		reinterpret_cast<void**>(&OpenVR_Activate)
-	);
-
-	status = MH_CreateHook(
-		reinterpret_cast<void*>(m_moduleBase + 0x18560),
-		reinterpret_cast<void*>(StarPatcher::GetComponentPatch),
-		reinterpret_cast<void**>(&OpenVR_GetComponent)
 	);
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
@@ -108,25 +102,4 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(void* thisptr, uint32_t u
 	vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMaxAnalogGain_Float, 1.0f);
 
 	return result;
-}
-
-void* __fastcall StarPatcher::GetComponentPatch(void* thisptr, const char* name)
-{
-	if (strcmp(name, "IVRDisplayComponent_003") == 0) {
-		if (m_displayComponentWrapper == nullptr)
-			m_displayComponentWrapper = std::make_unique<IVRDisplayComponentWrapper>(
-				reinterpret_cast<vrstub::IVRDisplayComponent_002*>(reinterpret_cast<uintptr_t>(thisptr) + 8)
-			);
-		return m_displayComponentWrapper.get();
-	}
-
-	if (strcmp(name, "IVRDriverDirectModeComponent_009") == 0) {
-		if (m_directModeComponentWrapper == nullptr)
-			m_directModeComponentWrapper = std::make_unique<IVRDriverDirectModeComponentWrapper>(
-				reinterpret_cast<vrstub::IVRDriverDirectModeComponent_005*>(reinterpret_cast<uintptr_t>(thisptr) + 16)
-			);
-		return m_directModeComponentWrapper.get();
-	}
-
-	return OpenVR_GetComponent(thisptr, name);
 }
