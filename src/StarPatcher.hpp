@@ -9,7 +9,7 @@ public:
 	void Initialize(uintptr_t mod);
 	void Destroy();
 private:
-	static vr::EVRInitError ActivatePatch(void* thisptr, uint32_t unObjectId);
+	static vr::EVRInitError ActivatePatch(uintptr_t thisptr, uint32_t unObjectId);
 
-	uintptr_t m_moduleBase;
+	static uintptr_t m_moduleBase;
 };
