@@ -100,14 +100,14 @@ static vr::DriverPose_t GetPose(uint32_t variant, uint32_t refreshRate)
 
 			vr::HmdVector3_t localEyeOffset = { 0.0f, 0.0f, 0.0f };
 			if (variant == 1) {
-				localEyeOffset = { 0.0f, 78.999499999999998f, 52.927599999999998f }; // from EEPROM
+				localEyeOffset = { 0.0f, -(78.999499999999998f) * 0.001f, (52.927599999999998f) * 0.001f }; // from EEPROM
 			}
 
 			vr::HmdVector3_t worldOffset = RotateVector(pose.qRotation, localEyeOffset);
 
-			pose.vecPosition[0] = trackerPos[0] + (worldOffset.v[0] * 0.001f);
-			pose.vecPosition[1] = trackerPos[1] + -(worldOffset.v[1] * 0.001f);
-			pose.vecPosition[2] = trackerPos[2] + (worldOffset.v[2] * 0.001f);
+			pose.vecPosition[0] = trackerPos[0] + worldOffset.v[0];
+			pose.vecPosition[1] = trackerPos[1] + worldOffset.v[1];
+			pose.vecPosition[2] = trackerPos[2] + worldOffset.v[2];
 
 			pose.vecVelocity[0] = tp.vVelocity.v[0];
 			pose.vecVelocity[1] = tp.vVelocity.v[1];
