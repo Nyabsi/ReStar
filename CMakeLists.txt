@@ -57,3 +57,10 @@ add_custom_command(
 )
 
 add_dependencies(driver_restar restar_resources)
+
+add_custom_command(
+    TARGET driver_restar POST_BUILD
+    COMMENT "Copying driver"
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:driver_restar> ${CUSTOM_OUTPUT_DIR}/bin/win64
+    COMMAND_EXPAND_LISTS
+)
