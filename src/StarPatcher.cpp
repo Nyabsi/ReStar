@@ -169,7 +169,7 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
 
                 vr::VRDriverLog()->Log(path.c_str());
 
-                if (((int (*)(void**, uint32_t*, uint32_t*, const char*))reinterpret_cast<void*>(m_moduleBase + 0x0B520))(&image->data, &image->width, &image->height, path.c_str()))
+                if (((unsigned int (*)(void**, uint32_t*, uint32_t*, const char*, uint32_t))reinterpret_cast<void*>(m_moduleBase + 0x0B520))(&image->data, &image->width, &image->height, path.c_str(), 2))
                 {
                     image->channels = 0;
                     failed_load = true;
@@ -187,7 +187,9 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                 {
                     float unk13 = *((float*)(thisptr + 500));
                     float unk14 = *((float*)(thisptr + 504));
-                    if (((int(*)(void*, GCImage*, float, float))reinterpret_cast<void*>(m_moduleBase + 0x11EE0))(*(void**)(thisptr + 640), image, unk13, unk14))
+                    float unk14a = *((float*)(thisptr + 508));
+                    float unk14b = *((float*)(thisptr + 512));
+                    if (((unsigned int(*)(void*, GCImage*, float, float, float, float))reinterpret_cast<void*>(m_moduleBase + 0x11EE0))(*(void**)(thisptr + 640), image, unk13, unk14, unk14a, unk14b))
                         vr::VRDriverLog()->Log("Compositor: Successfully initialized Ghost Correction\n");
                     else
                         vr::VRDriverLog()->Log("Compositor: Could not initialize Ghost Correction\n");
@@ -196,12 +198,8 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                     free(image);
             }
 
-            float unk15 = *((float*)(thisptr + 508));
-            float unk16 = *((float*)(thisptr + 500));
-            float unk17 = *((float*)(thisptr + 504));
-
             // this sets TrackedDeviceDisplayTransformUpdated, which btw doesn't exist in v006.
-            ((void(*)(uintptr_t, float, float, float, float))reinterpret_cast<void*>(m_moduleBase + 0x1A980))(thisptr, unk15, unk16, unk17, unk15);
+            ((void(*)(uintptr_t))reinterpret_cast<void*>(m_moduleBase + 0x1A980))(thisptr);
             ((void(*)(uintptr_t))reinterpret_cast<void*>(m_moduleBase + 0x1AE60))(thisptr);
 
             vr::VRDriverLog()->Log("Loading Mura correction files...\n");
