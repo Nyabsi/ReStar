@@ -1,0 +1,11 @@
+{
+	"alwaysActivate": false,
+	"name" : "restar",
+	"directory" : "",
+	"resourceOnly" : false,
+
+	"hmd_presence" :
+	[
+		"*.*"
+	]
+}
