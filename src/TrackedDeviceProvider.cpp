@@ -19,8 +19,6 @@ using namespace std::chrono_literals;
 
 #pragma comment(lib, "Shlwapi.lib")
 
-extern "C" IMAGE_DOS_HEADER __ImageBase;
-
 HMODULE lib = nullptr;
 HmdDriverFactoryFn factory = nullptr;
 
@@ -144,17 +142,18 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 
 	VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
 
-	wchar_t modulePath[MAX_PATH];
-	GetModuleFileNameW((HMODULE)&__ImageBase, modulePath, MAX_PATH);
-	PathRemoveFileSpecW(modulePath);
+	wchar_t starVRPath[MAX_PATH] = L"C:\\Program Files (x86)\\StarVR\\OpenVR\\bin\\win64";
+	wchar_t modulePath[MAX_PATH] = { };
 
-	AddDllDirectory(modulePath);
-	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS | LOAD_LIBRARY_SEARCH_USER_DIRS);
+	AddDllDirectory(starVRPath);
+	PathCombineW(modulePath, starVRPath, L"driver_starvr.dll");
 
-	wchar_t fullPath[MAX_PATH];
-	PathCombineW(fullPath, modulePath, L"driver_starvr.dll");
+	lib = LoadLibraryExW(modulePath, nullptr, 
+		LOAD_LIBRARY_SEARCH_DEFAULT_DIRS |
+		LOAD_LIBRARY_SEARCH_USER_DIRS |
+		LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR
+	);
 
-	lib = LoadLibraryW(fullPath);
     if (!lib)
     {
         DWORD err = GetLastError();
