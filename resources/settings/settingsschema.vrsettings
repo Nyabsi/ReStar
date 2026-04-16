@@ -42,11 +42,7 @@
         "control": "toggle",
         "label": "#{restar}Setting_Legacy_Mode",
         "on_label": "#{restar}Settings_Label_On",
-        "off_label": "#{restar}Settings_Label_Off",
-        "off_subsection": {
-          "control": "label",
-          "label": "Legacy Mode forces the compositor to ouput square (1:1) image."
-        }
+        "off_label": "#{restar}Settings_Label_Off"
       }
     ]
   }
