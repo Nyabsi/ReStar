@@ -236,7 +236,6 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             if (!vr::VRSettings()->GetBool("driver_restar", "disableMc"))
             {
                 vr::VRDriverLog()->Log("Loading Mura correction files...\n");
-
                 auto GetLocalAppData = []() -> std::string
                 {
                     PWSTR path = nullptr;
@@ -246,10 +245,29 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                         std::wstring wpath(path);
                         CoTaskMemFree(path);
 
-                        return std::string(wpath.begin(), wpath.end());
+                        if (wpath.empty())
+                            return {};
+
+                        int sizeNeeded = WideCharToMultiByte(
+                            CP_UTF8, 0,
+                            wpath.c_str(), (int)wpath.size(),
+                            nullptr, 0,
+                            nullptr, nullptr
+                        );
+
+                        std::string result(sizeNeeded, 0);
+
+                        WideCharToMultiByte(
+                            CP_UTF8, 0,
+                            wpath.c_str(), (int)wpath.size(),
+                            result.data(), sizeNeeded,
+                            nullptr, nullptr
+                        );
+
+                        return result;
                     }
 
-                    return "";
+                    return {};
                 };
 
                 std::string path = GetLocalAppData();
@@ -298,7 +316,8 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                 *(uint8_t*)(displayPtr + 288) = 1;
 
                 uintptr_t* tmpPtrAlloc = (uintptr_t*)malloc(8);
-                *tmpPtrAlloc = displayPtr;
+                if (tmpPtrAlloc)
+                    *tmpPtrAlloc = displayPtr;
 
                 std::mutex mtx;
                 std::condition_variable cv;
