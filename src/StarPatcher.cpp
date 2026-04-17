@@ -180,8 +180,6 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                 path += *(std::string*)(thisptr + 104); // driver root
                 path += "\\resources\\gc\\StarVR_v0.gc";
 
-                vr::VRDriverLog()->Log(path.c_str());
-
                 // Load ghost correction image from disk
                 if (((unsigned int (*)(void**, uint32_t*, uint32_t*, const char*, uint32_t))reinterpret_cast<void*>(m_moduleBase + 0x0B520))(&image.data, &image.width, &image.height, path.c_str(), 2))
                 {
