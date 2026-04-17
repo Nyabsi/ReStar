@@ -66,7 +66,22 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
     float fovLimit = 0;
     if (legacyMode)
     {
-        fovLimit = *((float*)(thisptr + 492)); // set to 140
+        switch (vr::VRSettings()->GetInt32("driver_restar", "legacyFovOption")) {
+            case 0:
+                fovLimit = 110.0f;
+                break;
+            case 1:
+                fovLimit = 140.0f;
+                break;
+            case 2:
+                fovLimit = 160.0f;
+                break;
+            default:
+                break;
+        }
+
+        *((float*)(thisptr + 492)) = fovLimit;
+        // fovLimit = *((float*)(thisptr + 492)); // set to 140
     }
     else
     {

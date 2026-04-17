@@ -32,7 +32,7 @@
           "label": "#{restar}Setting_Label_Ipd",
           "min": 53,
           "max": 77,
-          "step": 0.1,
+          "step": 1,
           "decimals": 1
         }
       },
@@ -43,6 +43,30 @@
         "label": "#{restar}Setting_Legacy_Mode",
         "on_label": "#{restar}Settings_Label_On",
         "off_label": "#{restar}Settings_Label_Off"
+      },
+      {
+        "requires_restart": true,
+        "name": "/settings/driver_restar/legacyFovOption",
+        "control": "select",
+        "label": "#{restar}Setting_Legacy_Fov",
+        "type": "int",
+        "options": [
+          {
+            "value": "0",
+            "label": "110"
+          },
+          {
+            "value": "1",
+            "label": "140"
+          },
+          {
+            "value": "2",
+            "label": "160"
+          }
+        ],
+        "requires": {
+          "/settings/driver_StarVR/legacyMode": true
+        }
       },
       {
         "requires_restart": true,

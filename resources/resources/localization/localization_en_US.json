@@ -9,6 +9,7 @@
   "Setting_Label_Ipd": "Interpupillary Distance",
   "Setting_Tracking_Variant": "Tracking Variant",
   "Setting_Legacy_Mode": "Legacy Mode",
+  "Setting_Legacy_Fov": "Legacy Fov",
   "Setting_Disable_Ghost_Correction": "Disable Ghost Correction",
-  "Setting_Disable_Mura_Correction":  "Disable Mura Correction"
+  "Setting_Disable_Mura_Correction": "Disable Mura Correction"
 }
