@@ -49,7 +49,8 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
 
     // Since the root path has changed, force it back to StarVR so util programs load correctly
     *((std::string*)(thisptr + 104)) = "C:\\Program Files (x86)\\StarVR\\OpenVR";
-    *((float*)(thisptr + 176)) = vr::VRSettings()->GetFloat(vr::k_pch_SteamVR_Section, "ipd");
+    // Overwrite the device IPD so we can load the proper mesh when automatic IPD is turned off
+    *((float*)(thisptr + 176)) = vr::VRSettings()->GetFloat(vr::k_pch_SteamVR_Section, "ipd") / 1000.0f;
 
     void** displayManagerPtr = reinterpret_cast<void**>(m_moduleBase + 0x3BE08);
     if (!*displayManagerPtr) {
