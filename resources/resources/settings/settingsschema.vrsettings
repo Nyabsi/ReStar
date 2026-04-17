@@ -43,6 +43,24 @@
         "label": "#{restar}Setting_Legacy_Mode",
         "on_label": "#{restar}Settings_Label_On",
         "off_label": "#{restar}Settings_Label_Off"
+      },
+      {
+        "requires_restart": true,
+        "advanced_only": true,
+        "name": "/settings/driver_restar/disableGc",
+        "control": "toggle",
+        "label": "#{restar}Setting_Disable_Ghost_Correction",
+        "on_label": "#{restar}Settings_Label_On",
+        "off_label": "#{restar}Settings_Label_Off"
+      },
+      {
+        "requires_restart": true,
+        "advanced_only": true,
+        "name": "/settings/driver_restar/disableMc",
+        "control": "toggle",
+        "label": "#{restar}Setting_Disable_Mura_Correction",
+        "on_label": "#{restar}Settings_Label_On",
+        "off_label": "#{restar}Settings_Label_Off"
       }
     ]
   }

@@ -163,7 +163,7 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMaxAnalogGain_Float, 1.0f);
 
             uint8_t settingsInitialized = *((uint8_t*)(thisptr + 496));
-            if (settingsInitialized)
+            if (settingsInitialized && !vr::VRSettings()->GetBool("driver_restar", "disableGc"))
             {
                 struct GCImage {
                     void* data;
@@ -215,57 +215,60 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             // Initializes Hidden Area Mesh if Legacy Mode is in use
             ((void(*)(uintptr_t))reinterpret_cast<void*>(m_moduleBase + 0x1AE60))(thisptr);
 
-            vr::VRDriverLog()->Log("Loading Mura correction files...\n");
-
-            auto GetLocalAppData = []() -> std::string
+            if (!vr::VRSettings()->GetBool("driver_restar", "disableMc"))
             {
-                PWSTR path = nullptr;
+                vr::VRDriverLog()->Log("Loading Mura correction files...\n");
 
-                if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path)))
+                auto GetLocalAppData = []() -> std::string
                 {
-                    std::wstring wpath(path);
-                    CoTaskMemFree(path);
+                    PWSTR path = nullptr;
 
-                    return std::string(wpath.begin(), wpath.end());
+                    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path)))
+                    {
+                        std::wstring wpath(path);
+                        CoTaskMemFree(path);
+
+                        return std::string(wpath.begin(), wpath.end());
+                    }
+
+                    return "";
+                };
+
+                std::string path = GetLocalAppData();
+
+                uint32_t width = *((uint32_t*)(thisptr + 200));
+                uint32_t height = *((uint32_t*)(thisptr + 204));
+
+                std::string leftPanelSerial = *(std::string*)(thisptr + 240);
+                std::string rightPanelSerial = *(std::string*)(thisptr + 272);
+
+                struct MuraCorrection {
+                    // I don't know exact channel format, but each channel contains information about formats, colours, resolution and bla bla.
+                    uint8_t channel_r[0x24];
+                    uint8_t channel_g[0x24];
+                    uint8_t channel_b[0x24];
+                    uint8_t unk36;
+                    uint8_t unk40;
+                    uint8_t unk44;
+                    uint8_t unk48;
+                    uint8_t reserved0[0x04];
+                }; // 0x50
+
+                MuraCorrection correction = {};
+                // Load mura correction files
+                if (((unsigned int(*)(void*, uint32_t, uint32_t, uint32_t, std::string, std::string, uint8_t, uint8_t, std::string))reinterpret_cast<void*>(m_moduleBase + 0x225E0))(&correction, verticalFlag ? 1195 : 1792, width / 2, height, leftPanelSerial, rightPanelSerial, horizontalFlag, verticalFlag, path))
+                {
+                    vr::VRDriverLog()->Log("Successfully loaded Mura corrections from disk and created lookup table.\n");
+                    // Initialize mura correction
+                    if (((unsigned int(*)(uintptr_t, void*, void*, void*))reinterpret_cast<void*>(m_moduleBase + 0x11C30))(*(uintptr_t*)(thisptr + 640), correction.channel_r, correction.channel_g, correction.channel_b))
+                        vr::VRDriverLog()->Log("Compositor: Successfully initialized Mura Correction\n");
+                    else
+                        vr::VRDriverLog()->Log("Compositor: Could not initialize Mura Correction\n");
                 }
-
-                return "";
-            };
-
-            std::string path = GetLocalAppData();
-
-            uint32_t width = *((uint32_t*)(thisptr + 200));
-            uint32_t height = *((uint32_t*)(thisptr + 204));
-
-            std::string leftPanelSerial = *(std::string*)(thisptr + 240);
-            std::string rightPanelSerial = *(std::string*)(thisptr + 272);
-
-            struct MuraCorrection {
-                // I don't know exact channel format, but each channel contains information about formats, colours, resolution and bla bla.
-                uint8_t channel_r[0x24];
-                uint8_t channel_g[0x24];
-                uint8_t channel_b[0x24];
-                uint8_t unk36;
-                uint8_t unk40;
-                uint8_t unk44;
-                uint8_t unk48;
-                uint8_t reserved0[0x04];
-            }; // 0x50
-
-            MuraCorrection correction = {};
-            // Load mura correction files
-            if (((unsigned int(*)(void*, uint32_t, uint32_t, uint32_t, std::string, std::string, uint8_t, uint8_t, std::string))reinterpret_cast<void*>(m_moduleBase + 0x225E0))(&correction, verticalFlag ? 1195 : 1792, width / 2, height, leftPanelSerial, rightPanelSerial, horizontalFlag, verticalFlag, path))
-            {
-                vr::VRDriverLog()->Log("Successfully loaded Mura corrections from disk and created lookup table.\n");
-                // Initialize mura correction
-                if ( ((unsigned int(*)(uintptr_t, void*, void*, void*))reinterpret_cast<void*>(m_moduleBase + 0x11C30))(*(uintptr_t*)(thisptr + 640), correction.channel_r, correction.channel_g, correction.channel_b) )
-                    vr::VRDriverLog()->Log("Compositor: Successfully initialized Mura Correction\n");
                 else
-                    vr::VRDriverLog()->Log("Compositor: Could not initialize Mura Correction\n");
-            }
-            else
-            {
-                vr::VRDriverLog()->Log("Failed to load Mura corrections from disk and generating lookup table.\n");
+                {
+                    vr::VRDriverLog()->Log("Failed to load Mura corrections from disk and generating lookup table.\n");
+                }
             }
 
             // here we're creating thread that runs periodic nvidia timer

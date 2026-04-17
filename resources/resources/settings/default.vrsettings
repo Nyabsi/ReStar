@@ -5,7 +5,9 @@
   },
   "driver_restar": {
     "enable": true,
-    "hmdTrackerVariant":  1
+    "hmdTrackerVariant": 1,
+    "disableGc": false,
+    "disableMc":  false
   },
   "SteamVR": {
     "renderCameraMode" : "raw"
