@@ -47,6 +47,9 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
 {
     *((uint32_t*)(thisptr + 24)) = unObjectId; // set objectId to unObjectId in the original class
 
+    // Since the root path has changed, force it back to StarVR so util programs load correctly
+    *((std::string*)(thisptr + 104)) = "C:\\Program Files (x86)\\StarVR\\OpenVR";
+
     void** displayManagerPtr = reinterpret_cast<void**>(m_moduleBase + 0x3BE08);
     if (!*displayManagerPtr) {
         *displayManagerPtr = malloc(0x1038);
