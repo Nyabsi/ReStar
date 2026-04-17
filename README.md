@@ -12,6 +12,7 @@ ReStar is a SteamVR driver patch for the StarVR One that aims to reimplement nat
 - Properties have been changed to reflect modern SteamVR driver behaviour
 - Input profile has added so newer games track properly
 - Device icon has been upgraded to the modern SteamVR gradient
+- Implements OpenXR Eye-Tracking (XR_EXT_eye_gaze_interaction)
 
 ## Installation
 
