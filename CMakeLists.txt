@@ -44,6 +44,7 @@ target_link_libraries(driver_restar
         ITE_FW
         StarVR_API
         minhook
+        Tobii
 )
 
 set(CUSTOM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin")

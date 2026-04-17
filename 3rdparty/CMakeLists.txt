@@ -21,3 +21,13 @@ set_target_properties(StarVR_API PROPERTIES
 target_include_directories(StarVR_API INTERFACE
     ${CMAKE_SOURCE_DIR}/3rdparty/StarVR/inc
 )
+
+add_library(Tobii STATIC IMPORTED GLOBAL)
+
+set_target_properties(Tobii PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/3rdparty/Tobii/lib/tobii_stream_engine.lib"
+)
+
+target_include_directories(Tobii INTERFACE
+    ${CMAKE_SOURCE_DIR}/3rdparty/Tobii/include
+)

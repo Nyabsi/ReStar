@@ -13,7 +13,6 @@
 #include <functional>
 
 #include <ITE_FW.h>
-#include <starvr_user_api.h>
 
 using namespace std::chrono_literals;
 
@@ -272,7 +271,7 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 
 	m_is_active_.exchange(true);
 	m_update_thread_ = std::thread(&TrackedDeviceProvider::Update, this);
-	 
+
     return result;
 }
 

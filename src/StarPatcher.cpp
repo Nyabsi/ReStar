@@ -8,10 +8,16 @@
 #include <mutex>
 #include <format>
 
+static tobii_api_t* api;
+
 using OpenVR_Activate_tmpl = vr::EVRInitError(__fastcall*)(uintptr_t, uint32_t);
 OpenVR_Activate_tmpl OpenVR_Activate = nullptr;
 
+using Wearable_Callback_tmpl = vr::EVRInitError(__fastcall*)(tobii_wearable_data_t* data, void* user_data);
+Wearable_Callback_tmpl Wearable_Callback = nullptr;
+
 uintptr_t StarPatcher::m_moduleBase = {};
+vr::VRInputComponentHandle_t StarPatcher::m_eyeTrackingInput = vr::k_ulInvalidInputComponentHandle;
 
 StarPatcher::StarPatcher()
 {
@@ -19,6 +25,7 @@ StarPatcher::StarPatcher()
 }
 
 #define SVR_ACTIVATE_2_99_9999 0x183C0
+#define SVR_WEARABLE_CALLBACK_2_99_9999 0x21FF0
 
 void StarPatcher::Initialize(uintptr_t mod)
 {
@@ -32,11 +39,21 @@ void StarPatcher::Initialize(uintptr_t mod)
 		reinterpret_cast<void**>(&OpenVR_Activate)
 	);
 
+    MH_CreateHook(
+        reinterpret_cast<void*>(m_moduleBase + SVR_WEARABLE_CALLBACK_2_99_9999),
+        reinterpret_cast<void*>(StarPatcher::WearableCallbackPatch),
+        reinterpret_cast<void**>(&Wearable_Callback)
+    );
+
+    tobii_api_create(&api, nullptr, nullptr);
+
 	MH_EnableHook(MH_ALL_HOOKS);
 }
 
 void StarPatcher::Destroy()
 {
+    tobii_api_destroy(api);
+
 	MH_DisableHook(MH_ALL_HOOKS);
 	MH_Uninitialize();
 }
@@ -170,6 +187,7 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceStandbyAlert_String, "{restar}/icons/headset_status_standby_alert.png");
 
             vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayAllowNightMode_Bool, true);
+            vr::VRProperties()->SetBoolProperty(container, vr::Prop_SupportsXrEyeGazeInteraction_Bool, true);
 
             std::vector<float> available_frametimes = { 72.0f, 75.0f, 89.0f, 90.0f };
             vr::VRProperties()->SetPropertyVector(container, vr::Prop_DisplayAvailableFrameRates_Float_Array, vr::k_unFloatPropertyTag, &available_frametimes);
@@ -181,6 +199,8 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplaySupportsAnalogGain_Bool, true);
             vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMinAnalogGain_Float, 0.0f);
             vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayMaxAnalogGain_Float, 1.0f);
+
+            vr::VRDriverInput()->CreateEyeTrackingComponent(container, "/eyetracking", &m_eyeTrackingInput);
 
             uint8_t settingsInitialized = *((uint8_t*)(thisptr + 496));
             if (settingsInitialized && !vr::VRSettings()->GetBool("driver_restar", "disableGc"))
@@ -347,7 +367,7 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
                 *(std::thread*)(displayPtr + 296) = std::move(thr);
             }
 
-            void* eyeTrackerClassPtr = ((void* (*)(std::thread*))reinterpret_cast<void*>(m_moduleBase + 0x20DD0))((std::thread*)(displayPtr + 296));
+            void* eyeTrackerClassPtr = ((void* (*)())reinterpret_cast<void*>(m_moduleBase + 0x20DD0))();
             *(void**)(thisptr + 656) = eyeTrackerClassPtr;
 
             int result = {};
@@ -371,4 +391,89 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
         vr::VRDriverLog()->Log("Direct Mode init failed\n");
         return vr::VRInitError_Driver_Failed;
     }
+}
+
+void StarPatcher::WearableCallbackPatch(tobii_wearable_data_t* data, void* user_data)
+{
+    Wearable_Callback(data, user_data);
+
+    vr::VREyeTrackingData_t vrEyeTrackingData = {};
+
+    const bool leftValid = 
+        data->left.gaze_direction_validity == TOBII_VALIDITY_VALID && 
+        data->left.gaze_origin_validity == TOBII_VALIDITY_VALID;
+
+    const bool rightValid =
+        data->right.gaze_direction_validity == TOBII_VALIDITY_VALID &&
+        data->right.gaze_origin_validity == TOBII_VALIDITY_VALID;
+
+    const float leftW = leftValid ? 1.0f : 0.0f;
+    const float rightW = rightValid ? 1.0f : 0.0f;
+
+    const float totalW = leftW + rightW;
+
+    const bool anyValid = leftValid || rightValid;
+
+    vrEyeTrackingData.bActive = anyValid;
+    vrEyeTrackingData.bTracked = anyValid;
+    vrEyeTrackingData.bValid = anyValid;
+
+    float origin_mm[3] = { 0.f, 0.f, 0.f };
+    float dir[3] = { 0.f, 0.f, 0.f };
+
+    auto addEyeWeighted = [&](float w, const tobii_wearable_eye_t& eye)
+    {
+        origin_mm[0] += eye.gaze_origin_mm_xyz[0] * w;
+        origin_mm[1] += eye.gaze_origin_mm_xyz[1] * w;
+        origin_mm[2] += eye.gaze_origin_mm_xyz[2] * w;
+
+        dir[0] += eye.gaze_direction_normalized_xyz[0] * w;
+        dir[1] += eye.gaze_direction_normalized_xyz[1] * w;
+        dir[2] += eye.gaze_direction_normalized_xyz[2] * w;
+    };
+
+    addEyeWeighted(leftW, data->left);
+    addEyeWeighted(rightW, data->right);
+
+    origin_mm[0] /= totalW;
+    origin_mm[1] /= totalW;
+    origin_mm[2] /= totalW;
+
+    float len = std::sqrt(dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]);
+    if (len > 1e-6f)
+    {
+        dir[0] /= len;
+        dir[1] /= len;
+        dir[2] /= len;
+    }
+
+    vr::HmdVector3_t origin_m{
+        -origin_mm[0] / 1000.0f,
+         origin_mm[1] / 1000.0f,
+        -origin_mm[2] / 1000.0f
+    };
+
+    vr::HmdVector3_t gazeDir{
+        -dir[0],
+         dir[1],
+        -dir[2]
+    };
+
+    vrEyeTrackingData.vGazeOrigin = origin_m;
+    vrEyeTrackingData.vGazeTarget = {
+        origin_m.v[0] + gazeDir.v[0],
+        origin_m.v[1] + gazeDir.v[1],
+        origin_m.v[2] + gazeDir.v[2]
+    };
+
+    int64_t timestamp = {};
+    tobii_system_clock(api, &timestamp);
+
+    const auto time_offset = static_cast<double>(data->timestamp_system_us - timestamp) * std::nano::num / std::nano::den;
+
+    vr::VRDriverInput()->UpdateEyeTrackingComponent(
+        m_eyeTrackingInput,
+        &vrEyeTrackingData,
+        time_offset
+    );
 }
