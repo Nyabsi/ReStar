@@ -213,9 +213,7 @@ vr::EVRInitError TrackedDeviceProvider::Init(vr::IVRDriverContext* pDriverContex
 	);
 
 	if (err == vr::VRSettingsError_UnsetSettingHasNoDefault) {
-		float ipd;
-		starvr::StarVR_User_GetIPD(&ipd);
-		m_ipd = ipd / 1000.0f;
+		m_ipd = 64.0f / 1000.0f;
 	}
 
 	m_trackingVariant = vr::VRSettings()->GetInt32(
@@ -366,7 +364,11 @@ void TrackedDeviceProvider::RunFrame()
 
 				if (m_ipd != ipd) {
 					m_ipd = ipd;
-					starvr::StarVR_User_SetIPD(ipd / 1000.0f);
+					vr::VRSettings()->SetFloat(
+						vr::k_pch_SteamVR_Section,
+						"ipd",
+						m_ipd
+					);
 				}
 
 				break;
