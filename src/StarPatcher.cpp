@@ -47,10 +47,15 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
 {
     *((uint32_t*)(thisptr + 24)) = unObjectId; // set objectId to unObjectId in the original class
 
-    // Since the root path has changed, force it back to StarVR so util programs load correctly
-    *((std::string*)(thisptr + 104)) = "C:\\Program Files (x86)\\StarVR\\OpenVR";
-    // Overwrite the device IPD so we can load the proper mesh when automatic IPD is turned off
-    *((float*)(thisptr + 176)) = vr::VRSettings()->GetFloat(vr::k_pch_SteamVR_Section, "ipd") / 1000.0f;
+    // Patch configuration before driver initialization
+    {
+        // Since the root path has changed, force it back to StarVR so util programs load correctly
+        *((std::string*)(thisptr + 104)) = "C:\\Program Files (x86)\\StarVR\\OpenVR";
+        // Overwrite the device IPD so we can load the proper mesh when automatic IPD is turned off
+        *((float*)(thisptr + 176)) = vr::VRSettings()->GetFloat(vr::k_pch_SteamVR_Section, "ipd") / 1000.0f;
+        // Override resolution to 4320 instead of 3480
+        *((uint32_t*)(thisptr + 200)) = 4320;
+    }
 
     void** displayManagerPtr = reinterpret_cast<void**>(m_moduleBase + 0x3BE08);
     if (!*displayManagerPtr) {
