@@ -68,8 +68,6 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
         *((std::string*)(thisptr + 104)) = "C:\\Program Files (x86)\\StarVR\\OpenVR";
         // Overwrite the device IPD so we can load the proper mesh when automatic IPD is turned off
         *((float*)(thisptr + 176)) = vr::VRSettings()->GetFloat(vr::k_pch_SteamVR_Section, "ipd") / 1000.0f;
-        // Override resolution to 4320 instead of 3480
-        *((uint32_t*)(thisptr + 200)) = 4320;
     }
 
     void** displayManagerPtr = reinterpret_cast<void**>(m_moduleBase + 0x3BE08);
@@ -469,7 +467,7 @@ void StarPatcher::WearableCallbackPatch(tobii_wearable_data_t* data, void* user_
     int64_t timestamp = {};
     tobii_system_clock(api, &timestamp);
 
-    const auto time_offset = static_cast<double>(data->timestamp_system_us - timestamp) * std::nano::num / std::nano::den;
+    const auto time_offset = static_cast<double>(data->timestamp_system_us - timestamp) * std::micro::num / std::micro::den;
 
     vr::VRDriverInput()->UpdateEyeTrackingComponent(
         m_eyeTrackingInput,
