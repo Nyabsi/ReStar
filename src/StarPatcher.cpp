@@ -169,6 +169,8 @@ vr::EVRInitError __fastcall StarPatcher::ActivatePatch(uintptr_t thisptr, uint32
             vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceStandby_String, "{restar}/icons/headset_status_standby.png");
             vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceStandbyAlert_String, "{restar}/icons/headset_status_standby_alert.png");
 
+            vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayAllowNightMode_Bool, true);
+
             std::vector<float> available_frametimes = { 72.0f, 75.0f, 89.0f, 90.0f };
             vr::VRProperties()->SetPropertyVector(container, vr::Prop_DisplayAvailableFrameRates_Float_Array, vr::k_unFloatPropertyTag, &available_frametimes);
 
