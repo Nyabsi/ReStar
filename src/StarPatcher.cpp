@@ -24,17 +24,15 @@ void StarPatcher::Initialize(uintptr_t mod)
 {
 	m_moduleBase = mod;
 
-	MH_STATUS status;
+    MH_Initialize();
 
-	status = MH_Initialize();
-
-	status = MH_CreateHook(
+	MH_CreateHook(
 		reinterpret_cast<void*>(m_moduleBase + SVR_ACTIVATE_2_99_9999),
 		reinterpret_cast<void*>(StarPatcher::ActivatePatch),
 		reinterpret_cast<void**>(&OpenVR_Activate)
 	);
 
-	status = MH_EnableHook(MH_ALL_HOOKS);
+	MH_EnableHook(MH_ALL_HOOKS);
 }
 
 void StarPatcher::Destroy()
